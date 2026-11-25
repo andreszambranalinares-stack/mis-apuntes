@@ -105,10 +105,23 @@ solo tokens CSS (claro/oscuro), no desbordar a 390 px, y liberar timers en el cl
   Las opciones se barajan solas. Preguntas propias, nunca copiadas de exámenes reales.
 - Orientativo: 5–10 tarjetas y 3–6 preguntas por sección.
 
-## Verificar
-```
-python -m http.server 5173
-```
-Abrir `http://localhost:5173`, recorrer todas las secciones nuevas (los interactivos
-cargan al hacer scroll), sin errores en consola y sin scroll horizontal a 390 px.
-Comprobar sintaxis: `node --input-type=module --check < archivo.js`.
+## Verificar (siempre, antes de publicar)
+1. `node tools/check.mjs` → debe decir "Todo correcto" (ids, referencias, tablas,
+   respuestas del test, interactivos registrados, regiones del atlas…).
+2. Sintaxis: `node --input-type=module --check < archivo.js`.
+3. Servidor local sin caché: `python .claude/serve.py 5173` (o la configuración
+   `mis-apuntes` de `.claude/launch.json`). Con `python -m http.server` el navegador puede
+   quedarse con versiones viejas de los módulos y engañarte.
+4. Recorrer todas las secciones nuevas con scroll (los interactivos cargan al verse),
+   pulsar sus botones y mover sus deslizadores: sin errores en consola, sin `.viz-err`,
+   sin scroll horizontal a 390 px, y probar el buscador con términos del tema nuevo.
+
+## Errores ya vistos (no repetirlos)
+- Toda entrada del índice de búsqueda se normaliza en `buildIndex()`; no añadir entradas
+  después ni de forma asíncrona.
+- En las tablas, la primera celda de cada fila es la cabecera de fila: `cols` NO la incluye.
+- Las teclas de los juegos solo hacen `preventDefault` si el juego las ha usado (devuelven
+  `true`); si no, Espacio deja de desplazar la página.
+- En los SVG con texto, evitar etiquetas largas: en móvil se ven a ~60 % del tamaño.
+  Las etiquetas de los selectores de escenas deben ser cortas (campo `corto`).
+- Contadores (interactivos, tarjetas…) se calculan de los datos, no de listas a mano.

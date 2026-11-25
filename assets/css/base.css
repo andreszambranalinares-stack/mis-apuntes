@@ -243,7 +243,12 @@ html.rail .theme-toggle { padding: 0 10px; }
 .search-results .t { font-weight: 700; }
 .search-results .s { display: block; font-size: .85rem; color: var(--muted); line-height: 1.4; }
 .search-results .empty { padding: 24px; text-align: center; color: var(--muted); }
-.search-results mark { background: var(--accent-tint); color: inherit; border-radius: 3px; padding: 0 2px; }
+.search-results mark { background: var(--accent-tint); color: inherit; border-radius: 3px; padding: 0; box-shadow: 0 0 0 2px var(--accent-tint); }
+.search-results a[aria-selected="true"] mark, .search-results a:hover mark { background: var(--accent); color: #fff; box-shadow: 0 0 0 2px var(--accent); }
+.search-close { flex: none; min-height: 40px; padding: 0 6px; border: 0; background: none; cursor: pointer; color: var(--ink-2); font-weight: 700; }
+.search-close .lbl-touch { display: none; padding: 8px 12px; border-radius: 9px; background: var(--paper-2); }
+@media (hover: none), (max-width: 767px) { .search-close .lbl-desk { display: none; } .search-close .lbl-touch { display: inline-block; } }
+.search-input input::-webkit-search-cancel-button { cursor: pointer; }
 
 /* ---------- Toast ---------- */
 .toast {

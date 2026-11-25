@@ -51,7 +51,9 @@ lo permita. Prioriza lo visual: si hay cerebro, que se vea dónde; si hay flujo,
 5. Interactivos nuevos: registro en `assets/js/viz/index.js` + lista en `CLAUDE.md`.
 
 ## 5. Verificar (obligatorio)
+- `node tools/check.mjs` tiene que terminar en "Todo correcto".
 - `node --input-type=module --check < archivo.js` para cada archivo nuevo.
+- Prueba el buscador con 5–10 conceptos del tema nuevo: deben aparecer y llevar al apartado.
 - Servidor local (`.claude/launch.json` → `mis-apuntes`) y recorrer todas las secciones
   nuevas con scroll hasta abajo: ningún `.viz-err`, ninguna excepción en consola.
 - A 390 px de ancho: sin scroll horizontal. A 820 px y a 1280 px se ve bien.

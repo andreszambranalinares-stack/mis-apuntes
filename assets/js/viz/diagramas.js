@@ -16,11 +16,13 @@ export function redesTres(el) {
   el.innerHTML = `<div class="viz-body"><div class="split" style="align-items:center">
     <svg viewBox="0 0 500 300" class="chart" role="img" aria-label="Las tres redes y sus relaciones">
       <defs><marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--ink-2)"/></marker></defs>
-      <path d="M160 232 L 335 232" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#ar3)"/>
-      <text x="248" y="222" text-anchor="middle" class="svgmono" style="font-size:10px">la alerta potencia la orientación</text>
+      <path d="M162 232 L 330 232" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#ar3)"/>
+      <text x="246" y="258" text-anchor="middle" class="svgmono" style="font-size:10px">la alerta potencia</text>
+      <text x="246" y="272" text-anchor="middle" class="svgmono" style="font-size:10px">la orientación</text>
       <path d="M215 105 L 140 190" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#ar3)" stroke-dasharray="5 4"/>
       <path d="M285 105 L 360 190" stroke="var(--ink-2)" stroke-width="2" marker-end="url(#ar3)" stroke-dasharray="5 4"/>
-      <text x="250" y="150" text-anchor="middle" class="svgmono" style="font-size:10px">reajusta el peso de cada red</text>
+      <text x="250" y="168" text-anchor="middle" class="svgmono" style="font-size:10px">el control reajusta</text>
+      <text x="250" y="182" text-anchor="middle" class="svgmono" style="font-size:10px">el peso de cada red</text>
       <g id="nodes"></g>
     </svg>
     <div id="det"></div></div></div>`;
@@ -75,10 +77,11 @@ export function dosEjes(el) {
       <text x="170" y="292" text-anchor="middle" class="ttl">ATENCIÓN →</text><text x="14" y="140" text-anchor="middle" class="ttl" transform="rotate(-90 14 140)">CONSCIENCIA →</text></svg>
     <div class="results" style="margin:0"><div class="insight" id="d"></div><p style="margin:0;font-size:.9rem;color:var(--muted)">Wundt los veía casi como lo mismo; hoy se separan en dos ejes distintos.</p></div></div></div>`;
   const pos = { nc: [30, 10], ac: [170, 10], nn: [30, 140], an: [170, 140] };
+  const LBL = { ac: ['Atendido', 'y consciente'], an: ['Atendido', 'no consciente'], nc: ['No atendido', 'pero consciente'], nn: ['Ni atendido', 'ni consciente'] };
   const draw = () => {
-    el.querySelector('#q').innerHTML = Object.entries(pos).map(([k, [x, y]]) => `<g data-q="${k}" style="cursor:pointer"><rect x="${x}" y="${y}" width="135" height="125" rx="12" fill="${sel === k ? 'var(--consc)' : 'var(--paper-2)'}" stroke="var(--line-2)"/>
-      <text x="${x + 67}" y="${y + 60}" text-anchor="middle" style="font:700 12px var(--f-body);fill:${sel === k ? '#fff' : 'var(--ink)'}">${Q[k][0].split(',')[0].split(' y ')[0]}</text>
-      <text x="${x + 67}" y="${y + 78}" text-anchor="middle" style="font:400 11px var(--f-body);fill:${sel === k ? '#fff' : 'var(--muted)'}">${(Q[k][0].split(/,| y /)[1] || '').trim()}</text></g>`).join('');
+    el.querySelector('#q').innerHTML = Object.entries(pos).map(([k, [x, y]]) => `<g data-q="${k}" style="cursor:pointer" tabindex="0" role="button" aria-label="${Q[k][0]}"><rect x="${x}" y="${y}" width="135" height="125" rx="12" fill="${sel === k ? 'var(--consc)' : 'var(--paper-2)'}" stroke="var(--line-2)"/>
+      <text x="${x + 67}" y="${y + 60}" text-anchor="middle" style="font:700 12px var(--f-body);fill:${sel === k ? '#fff' : 'var(--ink)'}">${LBL[k][0]}</text>
+      <text x="${x + 67}" y="${y + 78}" text-anchor="middle" style="font:400 11px var(--f-body);fill:${sel === k ? '#fff' : 'var(--muted)'}">${LBL[k][1]}</text></g>`).join('');
     el.querySelector('#d').innerHTML = `<b>${Q[sel][0]}.</b> ${Q[sel][1]}`;
   };
   el.addEventListener('click', e => { const g = e.target.closest('[data-q]'); if (g) { sel = g.dataset.q; draw(); } });
@@ -101,8 +104,8 @@ export function vertientes(el) {
     const g = el.querySelector('#g');
     g.innerHTML = `<circle cx="160" cy="130" r="118" fill="var(--consc)" opacity="${.05 + v / 400}"/><circle cx="160" cy="130" r="118" fill="none" stroke="var(--consc)" stroke-width="2"/>
       <text x="160" y="28" text-anchor="middle" style="font:600 10px var(--f-mono);fill:var(--consc-ink)">ESTADO</text>
-      <circle cx="160" cy="135" r="${30 + nIn * 8}" fill="var(--card)" stroke="var(--consc)" stroke-dasharray="4 3" style="transition:r .4s"/>
-      ${items.map((w, i) => { const a = (i / items.length) * Math.PI * 2; const inside = i < nIn; const rr = inside ? 22 + nIn * 4 : 104; return `<text x="${160 + Math.cos(a) * rr}" y="${138 + Math.sin(a) * rr * .8}" text-anchor="middle" style="font:700 10.5px var(--f-body);fill:${inside ? 'var(--ink)' : 'var(--muted)'};opacity:${inside ? 1 : .45};transition:all .4s">${w}</text>`; }).join('')}
+      <circle cx="160" cy="135" r="${nIn ? 70 + nIn * 4.5 : 26}" fill="var(--card)" stroke="var(--consc)" stroke-dasharray="4 3" style="transition:r .4s"/>
+      ${items.map((w, i) => { const a = (i / items.length) * Math.PI * 2 - Math.PI / 2; const inside = i < nIn; const rr = inside ? 52 + nIn * 3.5 : 106; return `<text x="${160 + Math.cos(a) * rr}" y="${138 + Math.sin(a) * rr * .8}" text-anchor="middle" style="font:700 10.5px var(--f-body);fill:${inside ? 'var(--ink)' : 'var(--muted)'};opacity:${inside ? 1 : .45};transition:all .4s">${w}</text>`; }).join('')}
       <circle cx="160" cy="135" r="${self ? 16 : 0}" fill="var(--consc)" style="transition:r .4s"/><text x="160" y="139" text-anchor="middle" style="font:800 11px var(--f-display);fill:#fff;opacity:${self ? 1 : 0}">YO</text>`;
     el.querySelector('#r').innerHTML = `<div><div class="v">${v}%</div><div class="l">Estado · vigilia</div></div>
       <div><div class="v">${nIn}/${items.length}</div><div class="l">Contenidos con acceso</div></div>
@@ -152,16 +155,16 @@ export function rasgos(el) {
 // ------------------------------------------------------------ Corbetta y Shulman
 export function corbetta(el) {
   const S = {
-    buscar: { t: 'Buscas a tu amiga del abrigo rojo en la estación', pasos: [
+    buscar: { corto: 'Buscar a alguien', t: 'Buscas a tu amiga del abrigo rojo en la estación', pasos: [
       ['dorsal', 'Red dorsal al mando: tu meta ("abrigo rojo") crea un mapa de prioridad y eleva por adelantado lo rojo.'],
       ['dorsal', 'El foco se desplaza y se mantiene donde "debe" estar según la tarea (parietal superior + FEF).'],
     ] },
-    portazo: { t: 'Estás leyendo y suena un portazo a tu izquierda', pasos: [
+    portazo: { corto: 'Un portazo', t: 'Estás leyendo y suena un portazo a tu izquierda', pasos: [
       ['dorsal', 'Leyendo: la red dorsal mantiene el foco en el texto.'],
       ['ventral', '¡PUM! La red ventral (TPJ + frontal inferior derecha) detecta lo saliente e inesperado e interrumpe: "suelta el foco".'],
       ['dorsal', 'La red dorsal reorienta el foco hacia la puerta. Las dos redes cooperan.'],
     ] },
-    nombre: { t: 'En una cafetería ruidosa alguien dice tu nombre', pasos: [
+    nombre: { corto: 'Dicen tu nombre', t: 'En una cafetería ruidosa alguien dice tu nombre', pasos: [
       ['dorsal', 'Atiendes a tu conversación (red dorsal).'],
       ['ventral', 'Tu nombre es muy relevante y no previsto: la red ventral dispara la reorientación.'],
       ['dorsal', 'Giras la atención (y quizá la mirada) hacia quien te nombra.'],
@@ -170,7 +173,7 @@ export function corbetta(el) {
   let sc = 'portazo', step = 0, timer = null;
   const nodes = { dorsal: ['spl', 'fef'], ventral: ['tpj', 'vlpfc'] };
   const col = { dorsal: '#2E5BA6', ventral: '#1FA1B8' };
-  el.innerHTML = `<div class="viz-body"><div class="ctrls">${seg(Object.entries(S).map(([k, v]) => [k, v.t.split(' ').slice(0, 3).join(' ') + '…']), sc, 'data-s')}<button class="btn sm accent" data-replay>▶ Reproducir</button></div>
+  el.innerHTML = `<div class="viz-body"><div class="ctrls">${seg(Object.entries(S).map(([k, v]) => [k, v.corto]), sc, 'data-s')}<button class="btn sm accent" data-replay>▶ Reproducir</button></div>
     <div class="split" style="align-items:center"><div id="b"></div><div><h4 id="tt" style="font-family:var(--f-display);margin:0 0 8px"></h4><div class="flow-step"><span class="n" id="sn"></span><p id="st"></p></div>
     <div class="legend" style="margin-top:12px"><span><i style="background:${col.dorsal}"></i>Dorsal: parietal sup. + FEF (metas)</span><span><i style="background:${col.ventral}"></i>Ventral: TPJ + frontal inf. dcho. (lo inesperado)</span></div></div></div></div>`;
   const draw = () => {
@@ -192,13 +195,13 @@ export function corbetta(el) {
 // ------------------------------------------------------------ Saliencia como interruptor
 export function redesSwitch(el) {
   const S = {
-    sofa: ['Estás tumbada en el sofá sin hacer nada', 'int', 'La red por defecto domina: pensamiento autobiográfico, divagación, planes para el finde.'],
-    movil: ['De repente vibra el móvil con un mensaje', 'ext', 'La red de saliencia detecta el cambio de relevancia y conmuta al modo externo: entran la red dorsal (¿dónde está el móvil?) y la ejecutiva (leer y responder).'],
-    recuerdo: ['El mensaje te hace recordar las vacaciones', 'int', 'La saliencia vuelve a conmutar: el contenido interno gana relevancia y la red por defecto recupera recursos.'],
-    examen: ['Estás resolviendo un problema de examen', 'ext', 'Modo externo sostenido: red dorsal (priorizar) y ejecutiva (reglas, conflicto). La red por defecto no se apaga: cede recursos.'],
+    sofa: ['Estás tumbada en el sofá sin hacer nada', 'int', 'La red por defecto domina: pensamiento autobiográfico, divagación, planes para el finde.', 'En el sofá'],
+    movil: ['De repente vibra el móvil con un mensaje', 'ext', 'La red de saliencia detecta el cambio de relevancia y conmuta al modo externo: entran la red dorsal (¿dónde está el móvil?) y la ejecutiva (leer y responder).', 'Vibra el móvil'],
+    recuerdo: ['El mensaje te hace recordar las vacaciones', 'int', 'La saliencia vuelve a conmutar: el contenido interno gana relevancia y la red por defecto recupera recursos.', 'Un recuerdo'],
+    examen: ['Estás resolviendo un problema de examen', 'ext', 'Modo externo sostenido: red dorsal (priorizar) y ejecutiva (reglas, conflicto). La red por defecto no se apaga: cede recursos.', 'Un examen'],
   };
   let sc = 'sofa';
-  el.innerHTML = `<div class="viz-body"><div class="ctrls">${seg(Object.entries(S).map(([k, v]) => [k, v[0].split(' ').slice(0, 3).join(' ') + '…']), sc, 'data-s')}</div>
+  el.innerHTML = `<div class="viz-body"><div class="ctrls">${seg(Object.entries(S).map(([k, v]) => [k, v[3]]), sc, 'data-s')}</div>
     <svg viewBox="0 0 560 220" class="chart" role="img" aria-label="La red de saliencia como interruptor"><g id="g"></g></svg>
     <div class="results"><div class="insight" id="t"></div></div></div>`;
   const draw = () => {
@@ -207,9 +210,9 @@ export function redesSwitch(el) {
     const ang = int ? -28 : 28;
     el.querySelector('#g').innerHTML = `
       <g opacity="${int ? 1 : .35}" style="transition:opacity .5s"><rect x="10" y="50" width="170" height="120" rx="16" fill="var(--dmn)" opacity=".15"/><rect x="10" y="50" width="170" height="120" rx="16" fill="none" stroke="var(--dmn)" stroke-width="${int ? 3 : 1.5}"/>
-        <text x="95" y="95" text-anchor="middle" style="font:800 14px var(--f-display);fill:var(--ink)">Red por defecto</text><text x="95" y="115" text-anchor="middle" class="svgmono">MODO INTERNO</text><text x="95" y="140" text-anchor="middle" style="font:400 11px var(--f-body);fill:var(--muted)">mPFC · cíngulo · precúneo · parietal</text></g>
+        <text x="95" y="95" text-anchor="middle" style="font:800 14px var(--f-display);fill:var(--ink)">Red por defecto</text><text x="95" y="115" text-anchor="middle" class="svgmono">MODO INTERNO</text><text x="95" y="138" text-anchor="middle" style="font:400 11px var(--f-body);fill:var(--muted)">mPFC · cíngulo</text><text x="95" y="153" text-anchor="middle" style="font:400 11px var(--f-body);fill:var(--muted)">precúneo · parietal</text></g>
       <g opacity="${int ? .35 : 1}" style="transition:opacity .5s"><rect x="380" y="50" width="170" height="120" rx="16" fill="var(--orient)" opacity=".15"/><rect x="380" y="50" width="170" height="120" rx="16" fill="none" stroke="var(--orient)" stroke-width="${int ? 1.5 : 3}"/>
-        <text x="465" y="90" text-anchor="middle" style="font:800 14px var(--f-display);fill:var(--ink)">Dorsal + Ejecutiva</text><text x="465" y="110" text-anchor="middle" class="svgmono">MODO EXTERNO</text><text x="465" y="135" text-anchor="middle" style="font:400 11px var(--f-body);fill:var(--muted)">parietal sup. · FEF · fronto-parietal</text></g>
+        <text x="465" y="90" text-anchor="middle" style="font:800 14px var(--f-display);fill:var(--ink)">Dorsal + Ejecutiva</text><text x="465" y="110" text-anchor="middle" class="svgmono">MODO EXTERNO</text><text x="465" y="133" text-anchor="middle" style="font:400 11px var(--f-body);fill:var(--muted)">parietal sup. · FEF</text><text x="465" y="148" text-anchor="middle" style="font:400 11px var(--f-body);fill:var(--muted)">fronto-parietal</text></g>
       <circle cx="280" cy="110" r="46" fill="var(--sal)" opacity=".14"/><circle cx="280" cy="110" r="10" fill="var(--sal)"/>
       <line x1="280" y1="110" x2="280" y2="52" stroke="var(--sal)" stroke-width="7" stroke-linecap="round" style="transform-origin:280px 110px;transform:rotate(${ang}deg);transition:transform .6s cubic-bezier(.3,1.6,.5,1)"/>
       <path d="M200 110 H 232" stroke="var(--line-2)" stroke-width="3"/><path d="M328 110 H 378" stroke="var(--line-2)" stroke-width="3"/>

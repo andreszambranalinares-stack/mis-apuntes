@@ -163,6 +163,7 @@ export function pageSeccion(key, secId) {
   const done = store.isDone(key, secId);
   const nCards = t.tarjetas.filter(c => c.sec === secId).length;
   const nQ = t.test.filter(q => q.sec === secId).length;
+  const nViz = s.bloques.filter(b => b.t === 'viz').length;
   const parte = t.partes[s.parte];
   const body = renderBlocks(s.bloques);
 
@@ -175,7 +176,7 @@ export function pageSeccion(key, secId) {
         <p class="lead">${esc(s.lead)}</p>
         <div class="meta">
           <span class="chip">${icon('clock')}${s.minutos} min</span>
-          ${s.viz?.length ? `<span class="chip">${icon('flask')}${s.viz.length} interactivo${s.viz.length > 1 ? 's' : ''}</span>` : ''}
+          ${nViz ? `<span class="chip">${icon('flask')}${nViz} interactivo${nViz > 1 ? 's' : ''}</span>` : ''}
           ${nCards ? `<a class="chip" href="#/tarjetas/${key}/${secId}" style="text-decoration:none">${nCards} tarjetas</a>` : ''}
           ${done ? `<span class="chip" style="color:var(--ok)">✓ Estudiada</span>` : ''}
         </div>
@@ -211,9 +212,20 @@ export function pageSeccion(key, secId) {
       const list = root.querySelector('#tocList');
       list.innerHTML = hs.map(h => `<li><a href="#/tema/${key}/${secId}?a=${h.id}" data-id="${h.id}">${h.textContent.replace(/^\d+/, '')}</a></li>`).join('');
       list.addEventListener('click', e => { const a = e.target.closest('a'); if (!a) return; e.preventDefault(); document.getElementById(a.dataset.id)?.scrollIntoView({ behavior: 'smooth' }); history.replaceState(null, '', a.getAttribute('href')); });
-      if ('IntersectionObserver' in window && hs.length) {
-        const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) list.querySelectorAll('a').forEach(a => a.classList.toggle('on', a.dataset.id === en.target.id)); }), { rootMargin: '-20% 0px -70% 0px' });
-        hs.forEach(h => io.observe(h)); cleanups.push(() => io.disconnect());
+      // marca el último apartado cuyo título ya ha pasado del 30 % superior de la pantalla
+      if (hs.length) {
+        let raf = 0;
+        const spy = () => {
+          cancelAnimationFrame(raf);
+          raf = requestAnimationFrame(() => {
+            const line = innerHeight * .3;
+            let cur = null;
+            for (const h of hs) { if (h.getBoundingClientRect().top <= line) cur = h.id; else break; }
+            list.querySelectorAll('a').forEach(a => a.classList.toggle('on', a.dataset.id === cur));
+          });
+        };
+        addEventListener('scroll', spy, { passive: true }); spy();
+        cleanups.push(() => { removeEventListener('scroll', spy); cancelAnimationFrame(raf); });
       }
       root.querySelector('[data-done]').addEventListener('click', e => {
         const on = store.toggleDone(key, secId);
@@ -236,15 +248,18 @@ export function pageSeccion(key, secId) {
 
 // ============================================================ ATLAS
 export function pageAtlas() {
+  const rq = new URLSearchParams(location.hash.split('?')[1] || '').get('r');
+  const r = REGIONES[rq] ? rq : null;
+  const props = { redes: Object.keys(REDES), seleccion: r, activa: r ? REGIONES[r].redes[0] : null };
   const html = `<div class="page"><div class="page-wide">
     <header class="sec-hero" data-red="base">
       <div class="eyebrow"><span class="pill">Atlas</span>Todas las regiones del temario</div>
       <h1>Atlas <em>cerebral</em></h1>
       <p class="lead">Las regiones y redes que salen en los apuntes, en un solo mapa. Activa una red para iluminar sus nodos, o toca un punto para ver qué hace y qué pasa si se lesiona.</p>
     </header>
-    <section class="viz" data-red="base"><div class="viz-body flush" data-viz="brain" data-props='${esc(JSON.stringify({ redes: Object.keys(REDES) }))}'></div></section>
+    <section class="viz" data-red="base"><div class="viz-body flush" data-viz="brain" data-props='${esc(JSON.stringify(props))}'></div></section>
     <h2 class="h-sec">Todas las regiones <small>${Object.keys(REGIONES).length}</small></h2>
     <div class="glosario">${Object.entries(REGIONES).map(([, r]) => `<div style="border-left-color:${REDES[r.redes[0]].color}"><dt>${esc(r.nombre)}</dt><dd><b style="background:none">${esc(r.lugar)}.</b> ${esc(r.funcion)}</dd></div>`).join('')}</div>
   </div></div>`;
-  return { html, title: 'Atlas cerebral', crumbs: [{ t: 'Inicio', h: '#/' }, { t: 'Atlas' }], mount: (root, c) => hydrate(root, c) };
+  return { html, title: 'Atlas cerebral', crumbs: [{ t: 'Inicio', h: '#/' }, { t: 'Atlas' }], mount: (root, c) => { hydrate(root, c); if (r) setTimeout(() => root.querySelector('.viz')?.scrollIntoView({ behavior: 'smooth' }), 150); } };
 }

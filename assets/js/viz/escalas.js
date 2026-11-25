@@ -27,7 +27,7 @@ export default function mount(el) {
   const pt = (ax, t) => [O[0] + dir[ax][0] * t, O[1] + dir[ax][1] * t];
 
   el.innerHTML = `<div class="viz-body"><div class="split">
-      <svg viewBox="0 0 440 340" class="chart" role="img" aria-label="Tres ejes: espacial, topológico y temporal"><g class="axes"></g></svg>
+      <svg viewBox="0 40 440 300" class="chart" role="img" aria-label="Tres ejes: espacial, topológico y temporal"><g class="axes"></g></svg>
       <div class="axes-legend"></div></div></div>`;
   const g = el.querySelector('.axes'), leg = el.querySelector('.axes-legend');
 
@@ -38,10 +38,10 @@ export default function mount(el) {
       const ticks = a.niveles.map((n, i) => {
         const [x, y] = pt(a.id, (i + 1) / 3.2);
         const act = on && sel.lv === i;
-        const lx = a.id === 'esp' ? x - 12 : x, ly = a.id === 'esp' ? y + 4 : a.id === 'top' ? y + 22 : y - 12;
+        const lx = a.id === 'esp' ? x - 12 : a.id === 'tmp' ? x + 12 : x, ly = a.id === 'esp' ? y + 4 : a.id === 'top' ? y + 22 : y + 16;
         return `<g style="cursor:pointer" data-ax="${a.id}" data-lv="${i}">
           <circle cx="${x}" cy="${y}" r="${act ? 11 : 7}" fill="${act ? a.c : 'var(--card)'}" stroke="${a.c}" stroke-width="2.5"/>
-          <text x="${lx}" y="${ly}" text-anchor="${a.id === 'esp' ? 'end' : 'middle'}" style="font:700 11.5px var(--f-body);fill:${act ? a.c : 'var(--ink-2)'}">${n[0]}</text></g>`;
+          <text x="${lx}" y="${ly}" text-anchor="${a.id === 'esp' ? 'end' : a.id === 'tmp' ? 'start' : 'middle'}" style="font:700 11.5px var(--f-body);fill:${act ? a.c : 'var(--ink-2)'}">${n[0]}</text></g>`;
       }).join('');
       return `<line x1="${O[0]}" y1="${O[1]}" x2="${x2}" y2="${y2}" stroke="${a.c}" stroke-width="${on ? 5 : 3}" stroke-linecap="round" opacity="${on ? 1 : .55}"/>
         <path d="M ${x2} ${y2} l ${a.id === 'esp' ? '-7 12 14 0' : a.id === 'top' ? '-12 -7 0 14' : '-14 0 6 12'} z" fill="${a.c}"/>

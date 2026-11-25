@@ -13,7 +13,7 @@ export function normanShallice(el) {
       pasos: ['La palabra activa "leer" (muy practicado) y el color activa "nombrar".', '¡Conflicto! Dos esquemas compiten por el mismo contexto.', 'El SAS inyecta el objetivo "nombra el color, no leas" y sube su prioridad.', '"Nombrar" gana; la inhibición lateral debilita "leer". Luego el SAS se retira.'], final: [.28, .95, .05] },
     nueva: { t: 'Situación nueva: tu calle está cortada', sch: [['Ruta habitual', .76], ['Buscar un desvío', .32], ['Parar y preguntar', .2]], sas: true, mot: false,
       pasos: ['El contexto ("voy a casa") activa con fuerza la ruta de siempre.', 'Pero no sirve: situación nueva. Riesgo de "desliz" de acción.', 'El SAS bloquea la respuesta prepotente y reconfigura la secuencia.', 'Gana "buscar un desvío".'], final: [.2, .9, .3] },
-    hambre: { t: 'Llevas horas estudiando y tienes hambre', sch: [['Seguir estudiando', .62], ['Ir a la nevera', .5], ['Mirar el móvil', .3]], sas: false, mot: true,
+    hambre: { t: 'Hambre: llevas horas estudiando', sch: [['Seguir estudiando', .62], ['Ir a la nevera', .5], ['Mirar el móvil', .3]], sas: false, mot: true,
       pasos: ['Dos esquemas compiten casi empatados.', 'El Sistema de Activación Motivacional aporta valor y urgencia (hambre).', 'Cambia el "tono" de la competición: sube "ir a la nevera".', 'Gana la nevera… sin control deliberado.'], final: [.4, .85, .2] },
   };
   let sc = 'stroop', step = 0, timer = null;
@@ -57,18 +57,18 @@ export function inhibicionLateral(el) {
   let a = 0, b = 0, sas = false, raf = null, hist = [];
   el.innerHTML = `<div class="viz-body">
     <div class="ctrls"><button class="btn accent" data-run="0">Stroop incongruente SIN SAS</button><button class="btn primary" data-run="1">Con SAS: refuerza "nombrar color"</button></div>
-    <div class="split" style="align-items:center">
+    <div class="split pair" style="align-items:center">
       <svg viewBox="0 0 300 200" class="chart"><g id="n"></g></svg>
       <svg viewBox="0 0 300 200" class="chart"><g id="c"></g></svg></div>
     <div class="results"><div class="insight" id="t">Elige una opción para ver la dinámica.</div></div></div>`;
   function nodes() {
     el.querySelector('#n').innerHTML = `<defs><marker id="ilA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--ink-2)"/></marker></defs>
-      <circle cx="80" cy="110" r="${26 + a * 22}" fill="var(--control)" opacity="${.25 + a * .6}"/><text x="80" y="114" text-anchor="middle" style="font:700 12px var(--f-body);fill:var(--ink)">Nombrar</text>
-      <circle cx="220" cy="110" r="${26 + b * 22}" fill="var(--ink-2)" opacity="${.2 + b * .6}"/><text x="220" y="114" text-anchor="middle" style="font:700 12px var(--f-body);fill:var(--ink)">Leer</text>
-      <path d="M115 95 Q150 75 185 95" stroke="var(--bad)" stroke-width="2.5" fill="none"/><path d="M185 125 Q150 145 115 125" stroke="var(--bad)" stroke-width="2.5" fill="none"/>
-      <line x1="181" y1="88" x2="189" y2="102" stroke="var(--bad)" stroke-width="3"/><line x1="111" y1="118" x2="119" y2="132" stroke="var(--bad)" stroke-width="3"/>
-      <text x="150" y="70" text-anchor="middle" class="svgmono">inhibición lateral</text>
-      ${sas ? `<rect x="40" y="10" width="80" height="28" rx="8" fill="var(--control)"/><text x="80" y="29" text-anchor="middle" style="font:800 12px var(--f-display);fill:#fff">SAS</text><path d="M80 38 L80 ${78 - a * 18}" stroke="var(--control)" stroke-width="3" marker-end="url(#ilA)"/>` : ''}`;
+      <circle cx="62" cy="115" r="${24 + a * 20}" fill="var(--control)" opacity="${.25 + a * .6}"/><text x="62" y="119" text-anchor="middle" style="font:700 12px var(--f-body);fill:var(--ink)">Nombrar</text>
+      <circle cx="238" cy="115" r="${24 + b * 20}" fill="var(--ink-2)" opacity="${.2 + b * .6}"/><text x="238" y="119" text-anchor="middle" style="font:700 12px var(--f-body);fill:var(--ink)">Leer</text>
+      <path d="M110 100 Q150 82 190 100" stroke="var(--bad)" stroke-width="2.5" fill="none"/><path d="M190 130 Q150 148 110 130" stroke="var(--bad)" stroke-width="2.5" fill="none"/>
+      <line x1="186" y1="93" x2="194" y2="107" stroke="var(--bad)" stroke-width="3"/><line x1="106" y1="123" x2="114" y2="137" stroke="var(--bad)" stroke-width="3"/>
+      <text x="150" y="172" text-anchor="middle" class="svgmono">inhibición lateral ⟷</text>
+      ${sas ? `<rect x="22" y="10" width="80" height="28" rx="8" fill="var(--control)"/><text x="62" y="29" text-anchor="middle" style="font:800 12px var(--f-display);fill:#fff">SAS</text><path d="M62 38 L62 ${86 - a * 18}" stroke="var(--control)" stroke-width="3" marker-end="url(#ilA)"/>` : ''}`;
   }
   function chart() {
     const X = i => 30 + i / 120 * 260, Y = v => 170 - v * 140;
@@ -151,7 +151,7 @@ export function reentrante(el) {
     <div class="ctrls">
       <div class="slider"><label for="ri">Reentrada / integración <output id="io"></output></label><input id="ri" type="range" min="0" max="1" step=".01" value=".3"><div class="ends"><span>Partes aisladas</span><span>Muy acopladas</span></div></div>
       <div class="slider"><label for="rd">Diferenciación <output id="dO"></output></label><input id="rd" type="range" min="0" max="1" step=".01" value=".7"><div class="ends"><span>Siempre el mismo patrón</span><span>Muchos estados</span></div></div></div>
-    <div class="split" style="align-items:center"><svg viewBox="0 0 320 260" class="chart"><g id="net"></g></svg><svg viewBox="0 0 260 260" class="chart"><g id="q"></g></svg></div>
+    <div class="split pair" style="align-items:center"><svg viewBox="0 0 320 260" class="chart"><g id="net"></g></svg><svg viewBox="0 0 260 260" class="chart"><g id="q"></g></svg></div>
     <div class="results"><div class="insight" id="t"></div></div></div>`;
   const N = [['Color', 'occipitotemporal', 60, 60], ['Forma', 'áreas ventrales', 260, 60], ['Lugar', 'parietal', 60, 200], ['Tálamo', 'núcleo reticular', 260, 200]];
   const pairs = [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]];
@@ -181,7 +181,7 @@ export function reentrante(el) {
     el.querySelector('#q').innerHTML = `<rect x="${X(.6)}" y="${Y(1)}" width="${X(1) - X(.6)}" height="${Y(.6) - Y(1)}" fill="var(--consc)" opacity=".15"/>
       <line x1="30" y1="230" x2="245" y2="230" class="axis"/><line x1="30" y1="25" x2="30" y2="230" class="axis"/>
       <text x="240" y="248" text-anchor="end">integración →</text><text x="34" y="22" class="ttl">diferenciación ↑</text>
-      <text x="${X(.8)}" y="${Y(.8)}" text-anchor="middle" style="font:700 11px var(--f-body);fill:var(--consc-ink)">núcleo</text><text x="${X(.8)}" y="${Y(.8) + 14}" text-anchor="middle" style="font:700 11px var(--f-body);fill:var(--consc-ink)">dinámico</text>
+      <text x="${X(.8)}" y="${Y(.95)}" text-anchor="middle" style="font:700 11px var(--f-body);fill:var(--consc-ink)">núcleo dinámico</text>
       <circle cx="${X(I)}" cy="${Y(D)}" r="9" fill="var(--consc)" stroke="var(--card)" stroke-width="3"/>`;
     el.querySelector('#t').innerHTML = I > .6 && D > .6 ? '<b>¡Núcleo dinámico!</b> Las áreas se co-determinan por reentrada (integración) y el sistema puede adoptar muchos estados distintos (diferenciación). Según Edelman y Tononi, un contenido es consciente cuando entra en esta coalición talamocortical.'
       : I > .6 ? '<b>Mucha integración, poca diferenciación:</b> todo está muy acoplado, pero el sistema repite siempre el mismo patrón. Sin riqueza de estados no hay consciencia según la teoría.'
@@ -202,12 +202,12 @@ export function gnw(el) {
       <div class="slider"><label for="gs">Fuerza / saliencia del estímulo <output id="gso"></output></label><input id="gs" type="range" min="0" max="1" step=".01" value=".55"></div>
       <div class="slider"><label for="ga">Atención dirigida al estímulo <output id="gao"></output></label><input id="ga" type="range" min="0" max="1" step=".01" value=".5"><div class="ends"><span>Ninguna</span><span>Toda</span></div></div></div>
     <div class="ctrls"><label class="chip" style="cursor:pointer"><input type="checkbox" id="busy" style="accent-color:var(--consc)"> El espacio ya está ocupado por otro contenido</label><button class="btn accent" data-go>▶ Presentar estímulo</button></div>
-    <div class="split" style="align-items:center"><svg viewBox="0 0 340 260" class="chart"><g id="br"></g></svg><svg viewBox="0 0 300 260" class="chart"><g id="ch"></g></svg></div>
+    <div class="split pair" style="align-items:center"><svg viewBox="0 0 380 260" class="chart"><g id="br"></g></svg><svg viewBox="0 0 300 260" class="chart"><g id="ch"></g></svg></div>
     <div class="results"><div class="insight" id="t">Ajusta los controles y presenta el estímulo.</div></div></div>`;
-  const outs = [['Informe verbal', 250, 30], ['Decisión', 300, 100], ['Memoria de trabajo', 300, 170], ['Acción', 250, 235]];
+  const outs = [['Informe verbal', 262, 30], ['Decisión', 282, 100], ['Memoria de trabajo', 282, 170], ['Acción', 262, 235]];
   function scene(local, global, lit) {
     el.querySelector('#br').innerHTML = `
-      <rect x="10" y="95" width="110" height="70" rx="12" fill="var(--consc)" opacity="${.1 + local * .6}" stroke="var(--consc)"/><text x="65" y="126" text-anchor="middle" style="font:700 12px var(--f-body);fill:var(--ink)">Área sensorial</text><text x="65" y="142" text-anchor="middle" class="svgmono" style="font-size:9px">procesamiento local</text>
+      <rect x="10" y="95" width="110" height="70" rx="12" fill="var(--consc)" opacity="${.1 + local * .6}" stroke="var(--consc)"/><text x="65" y="126" text-anchor="middle" style="font:700 12px var(--f-body);fill:var(--ink)">Área sensorial</text><text x="65" y="142" text-anchor="middle" class="svgmono" style="font-size:9px">proceso local</text>
       <circle cx="170" cy="130" r="${30 + global * 18}" fill="var(--consc)" opacity="${.08 + global * .5}"/><circle cx="170" cy="130" r="30" fill="var(--card)" stroke="var(--consc)" stroke-width="2"/>
       <text x="170" y="127" text-anchor="middle" style="font:800 11px var(--f-display);fill:var(--ink)">Espacio</text><text x="170" y="141" text-anchor="middle" style="font:800 11px var(--f-display);fill:var(--ink)">global</text>
       <path d="M120 130 L 140 130" stroke="var(--consc)" stroke-width="${1 + local * 4}"/>

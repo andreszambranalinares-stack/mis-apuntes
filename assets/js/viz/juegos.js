@@ -4,7 +4,8 @@ import { mean, shuffle, sleep, pick, rand } from '../util.js';
 function keys(map, cleanups) {
   const on = e => {
     if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName)) return;
-    const f = map[e.key] || map[e.code]; if (f) { e.preventDefault(); f(); }
+    // solo se "come" la tecla si el juego la ha usado (si no, Espacio/flechas siguen desplazando la página)
+    const f = map[e.key] || map[e.code]; if (f && f() === true) e.preventDefault();
   };
   addEventListener('keydown', on); cleanups.push(() => removeEventListener('keydown', on));
 }
@@ -85,7 +86,8 @@ export function mackworth(el) {
     const d = e.target.closest('[data-d]'); if (d && !running) { dur = +d.dataset.d; el.querySelectorAll('[data-d]').forEach(b => b.setAttribute('aria-pressed', String(b === d))); }
   });
   ar.addEventListener('pointerdown', () => running && respond());
-  keys({ ' ': () => running ? respond() : null, Space: () => running ? respond() : null }, cleanups);
+  const sp = () => { if (!running) return false; respond(); return true; };
+  keys({ ' ': sp }, cleanups);
   return () => { running = false; clearTimeout(timer); cleanups.forEach(f => f()); };
 }
 
@@ -140,7 +142,7 @@ export function posner(el) {
     el.querySelector('#res').innerHTML = `<div class="ns-bars">${rows}</div>
       <div class="insight">${d.i.length ? `Con la pista <b>válida</b> respondiste en ~${Math.round(v)} ms; con la <b>inválida</b>, en ~${Math.round(i)} ms. Esa diferencia (${Math.round(i - v)} ms) es el <b>coste</b> de tener que <b>desenganchar</b>, desplazar y reenganchar el foco en el otro lado. ` : ''}Fíjate: <b>no has movido los ojos</b> de la cruz. Has orientado la atención de forma <b>encubierta</b>.</div>`;
   }
-  const answer = s => { if (cur) cur(s); };
+  const answer = s => { if (!cur) return false; cur(s); return true; };
   el.addEventListener('click', e => {
     if (e.target.closest('[data-start]')) start();
     const r = e.target.closest('[data-r]'); if (r) answer(r.dataset.r);
@@ -213,7 +215,7 @@ export function busqueda(el) {
     el.querySelector('#res').innerHTML = (sr != null || sc != null) ? `<div class="insight">${sr != null ? `Rasgo simple: pasar de pocos a muchos elementos te costó <b>${Math.round(sr)} ms</b> (casi plano: <b>pop-out</b>). ` : ''}${sc != null ? `Conjunción: <b>${Math.round(sc)} ms</b> más con conjuntos grandes (búsqueda que crece con el tamaño). ` : ''}Según Treisman, en la conjunción la atención tiene que ir <b>posición a posición</b> uniendo color y forma.</div>` : '';
   }
   chart();
-  const answer = v => { if (cur) cur(v); };
+  const answer = v => { if (!cur) return false; cur(v); return true; };
   el.addEventListener('click', e => {
     if (e.target.closest('[data-start]')) start();
     const r = e.target.closest('[data-r]'); if (r) answer(+r.dataset.r);
@@ -300,7 +302,7 @@ export function stroop(el) {
     el.querySelector('#res').innerHTML = `<div class="ns-bars">${bar('Congruente (ROJO en rojo)', a, 1500, 'var(--ok)')}${bar('Incongruente (ROJO en azul)', b, 1500, 'var(--control)')}</div>
       <div class="insight">Leer es un <b>esquema automático</b> muy fuerte. En las incongruentes compiten "leer la palabra" y "nombrar el color": es la <b>selección bajo conflicto</b>. La cingulada anterior detecta el conflicto y la prefrontal lateral refuerza la regla "nombra el color" (el SAS de Norman y Shallice). Errores: ${res.err}.</div>`;
   }
-  const answer = i => { if (cur) cur(i); };
+  const answer = i => { if (!cur) return false; cur(i); return true; };
   el.addEventListener('click', e => { if (e.target.closest('[data-start]')) start(); const b = e.target.closest('[data-c]'); if (b) answer(+b.dataset.c); });
   keys({ 1: () => answer(0), 2: () => answer(1), 3: () => answer(2), 4: () => answer(3) }, cleanups);
   return () => { running = false; cleanups.forEach(f => f()); };
@@ -337,9 +339,9 @@ export function gonogo(el) {
     el.querySelector('#res').innerHTML = `<div class="readout"><div><div class="v">${s.hit}</div><div class="l">Aciertos (verde)</div></div><div><div class="v">${s.fa}</div><div class="l">Falsas alarmas (pulsaste en rojo)</div></div><div><div class="v">${s.om}</div><div class="l">Omisiones</div></div><div><div class="v">${Math.round(mean(s.rts))}</div><div class="l">TR medio (ms)</div></div></div>
       <div class="insight">Al ser casi todo verde, "pulsar" se vuelve una <b>respuesta prepotente</b>. Frenarla ante el rojo es <b>inhibición de respuestas</b>. Un control eficaz da <b>menos falsas alarmas</b>. En el cerebro, los <b>ganglios basales</b> aplican ese freno; su disfunción se expresa como impulsividad.</div>`;
   }
-  const press = () => { if (running) pressed = true; };
+  const press = () => { if (!running) return false; pressed = true; return true; };
   el.addEventListener('click', e => { if (e.target.closest('[data-start]')) start(); if (e.target.closest('[data-go]')) press(); });
   ar.addEventListener('pointerdown', e => { if (!e.target.closest('[data-start]')) press(); });
-  keys({ ' ': press, Space: press }, cleanups);
+  keys({ ' ': press }, cleanups);
   return () => { running = false; cleanups.forEach(f => f()); };
 }

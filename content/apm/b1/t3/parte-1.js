@@ -16,7 +16,7 @@ export const intro = {
     { t: 'h', html: 'Las tres escalas del estudio del cerebro' },
     { t: 'p', html: 'Para hablar del cerebro hay tres ejes complementarios. Cada uno responde a una pregunta distinta. Toca cada nivel del gráfico para ver ejemplos.' },
     { t: 'viz', id: 'escalas', k: 'Explora', titulo: 'Los tres ejes: dónde, cómo conectado y cuándo', desc: 'Toca un eje o un nivel para ver qué significa.', icon: 'layers' },
-    { t: 'tabla', titulo: 'Resumen de las escalas', cols: [{ n: 'Eje' }, { n: 'Pregunta' }, { n: 'Niveles (de abajo a arriba)' }], filas: [
+    { t: 'tabla', titulo: 'Resumen de las escalas', cols: [{ n: 'Pregunta' }, { n: 'Niveles (de abajo a arriba)' }], filas: [
       ['Espacial (rojo)', '¿<b>Dónde</b> ocurre la actividad?', 'Celular (neuronas y sinapsis) → poblaciones o ensamblajes neuronales → regiones o áreas cerebrales (p. ej., corteza visual o motora)'],
       ['Topológico (aguamarina)', '¿<b>Cómo está conectada</b> la actividad?', 'Conectividad local (microcircuitos) → mesoescala (módulos de neuronas interconectadas) → escala global (grandes redes, p. ej., red por defecto, control ejecutivo)'],
       ['Temporal (morado)', '¿<b>Cuándo</b> ocurre la actividad?', 'Procesos instantáneos (segundos; EEG, fMRI) → desarrollo a lo largo de la vida (madurez, envejecimiento) → escala evolutiva (comparación entre especies)'],

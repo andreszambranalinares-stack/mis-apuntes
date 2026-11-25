@@ -131,7 +131,7 @@
 /* ---------- Proceso (pasos encadenados) ---------- */
 .proceso ol { list-style: none; margin: 0; padding: 0; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0; counter-reset: p; }
 .proceso li { counter-increment: p; position: relative; padding: 0 12px 0 0; }
-.proceso li .bar { height: 4px; background: var(--accent); border-radius: 4px; margin: 18px 0 14px; position: relative; opacity: .35; }
+.proceso li .bar { height: 4px; background: var(--accent); border-radius: 4px; margin: 18px 0 28px; position: relative; opacity: .35; }
 .proceso li .bar::before { content: counter(p); position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font: 800 1rem/1 var(--f-display); opacity: 1; }
 .proceso li .bar { opacity: 1; background: color-mix(in srgb, var(--accent) 35%, transparent); }
 .proceso li:last-child .bar { background: transparent; }

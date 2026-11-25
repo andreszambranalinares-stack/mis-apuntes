@@ -6,7 +6,8 @@ import * as store from './store.js';
 import { esc, shuffle, icon } from './util.js';
 
 const secOf = (t, id) => t.secciones.find(s => s.id === id);
-const BOX_COLORS = ['var(--bad)', 'var(--alerta)', 'var(--orient)', 'var(--consc)', 'var(--ok)'];
+const badScope = kind => ({ html: `<div class="page"><div class="page-wide"><h1 class="h-sec">Ese tema o sección no existe</h1><p><a href="#/${kind}">Ver ${kind === 'test' ? 'el test' : 'las tarjetas'} de todo el temario</a></p></div></div>`, title: 'No encontrado', crumbs: [{ t: 'Inicio', h: '#/' }, { t: 'No encontrado' }] });
+const BOX_COLORS =['var(--bad)', 'var(--alerta)', 'var(--orient)', 'var(--consc)', 'var(--ok)'];
 
 function scopeSelect(kind, key, secId) {
   const opts = [`<option value="#/${kind}">Todo el temario</option>`];
@@ -31,6 +32,7 @@ function miniBrain(regionId) {
 // ============================================================ TARJETAS
 export function pageTarjetas(key, secId) {
   const temas = key ? [temaByKey(key)].filter(Boolean) : TEMAS;
+  if (key && (!temas.length || (secId && !secOf(temas[0], secId)))) return badScope('tarjetas');
   let cards = temas.flatMap(t => t.tarjetas.filter(c => !secId || c.sec === secId).map(c => ({ ...c, tema: t, s: secOf(t, c.sec) })));
   const t0 = temas[0];
   const scopeName = secId ? `${secOf(t0, secId)?.num} · ${secOf(t0, secId)?.titulo}` : key ? `Tema ${t0?.num}` : 'Todo el temario';
@@ -147,6 +149,7 @@ export function pageTarjetas(key, secId) {
 // ============================================================ TEST
 export function pageTest(key, secId) {
   const temas = key ? [temaByKey(key)].filter(Boolean) : TEMAS;
+  if (key && (!temas.length || (secId && !secOf(temas[0], secId)))) return badScope('test');
   const pool = temas.flatMap(t => t.test.filter(q => !secId || q.sec === secId).map(q => ({ ...q, tema: t, s: secOf(t, q.sec) })));
   const qKey = `${key || 'all'}/${secId || 'all'}`;
   const prevStats = store.quizStats(qKey);

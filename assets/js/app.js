@@ -1,6 +1,6 @@
 // Mis Apuntes — arranque, router por hash y armazón (menú, búsqueda, tema).
 import { ASIGNATURAS, TEMAS } from '../../content/indice.js';
-import { REDES } from '../../content/atlas.js';
+import { REDES, REGIONES } from '../../content/atlas.js';
 import * as store from './store.js';
 import { esc, norm, plain, $, $$ } from './util.js';
 import { pageHome, pageTema, pageSeccion, pageAtlas } from './pages.js';
@@ -149,73 +149,125 @@ addEventListener('scroll', () => {
 
 // ---------------------------------------------------------------- búsqueda
 let INDEX = null;
+const slugH = html => html.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/<[^>]+>/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+
+// Texto plano de cualquier bloque (para buscar dentro del contenido)
+function blockText(b) {
+  const j = a => (a || []).join(' · ');
+  switch (b.t) {
+    case 'p': case 'h3': case 'clave': return b.html;
+    case 'lista': case 'trampa': case 'esencial': case 'noexamen': return b.items ? j(b.items) : b.html;
+    case 'operaciones': return b.items.map(o => `${o.titulo}: ${o.texto} ${j(o.tareas)}`).join(' · ');
+    case 'proceso': return b.pasos.map(p => `${p.titulo}: ${p.texto} ${p.donde || ''}`).join(' · ');
+    case 'tabla': return b.titulo + ' · ' + b.filas.map(f => f.join(' ')).join(' · ');
+    case 'concepto': return `${b.extra || ''} ${b.ej || ''}`;
+    case 'pares': return [b.a, b.b].map(p => `${p.ej || ''} ${j(p.items)}`).join(' ');
+    case 'ejemplo': return `${b.titulo}: ${b.texto}`;
+    case 'check': return `${b.q} ${b.a}`;
+    case 'recurso': return `${b.titulo} ${b.desc || ''}`;
+    default: return '';
+  }
+}
+
 function buildIndex() {
   INDEX = [];
+  const add = e => INDEX.push(e);
   for (const t of TEMAS) {
-    INDEX.push({ kind: 'Tema', t: `Tema ${t.num} · ${t.titulo}`, s: t.resumen, href: `#/tema/${t.key}`, red: 'base' });
+    add({ kind: 'Tema', t: `Tema ${t.num} · ${t.titulo}`, s: t.resumen, href: `#/tema/${t.key}`, red: 'base' });
     for (const s of t.secciones) {
-      INDEX.push({ kind: 'Sección', t: `${s.num} · ${s.titulo}`, s: s.lead, href: `#/tema/${t.key}/${s.id}`, red: s.red });
-      let curH = null;
+      const base = `#/tema/${t.key}/${s.id}`;
+      add({ kind: 'Sección', t: `${s.num} · ${s.titulo}`, s: s.lead, href: base, red: s.red });
+      let curH = null, curHT = '';
       for (const b of s.bloques) {
-        if (b.t === 'h') curH = b.id || b.html.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/<[^>]+>/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
-        const anchor = curH ? `?a=${curH}` : '';
-        if (b.t === 'concepto') INDEX.push({ kind: 'Concepto', t: plain(b.titulo), s: plain(b.def), href: `#/tema/${t.key}/${s.id}${anchor}`, red: b.red || s.red });
-        if (b.t === 'glosario') b.items.forEach(([term, d]) => INDEX.push({ kind: 'Término', t: plain(term), s: plain(d), href: `#/tema/${t.key}/${s.id}${anchor}`, red: s.red }));
-        if (b.t === 'pares') [b.a, b.b].forEach(p => INDEX.push({ kind: 'Concepto', t: plain(p.titulo), s: plain(p.texto || (p.items || []).join(' ')), href: `#/tema/${t.key}/${s.id}${anchor}`, red: s.red }));
-        if (b.t === 'autores') b.items.forEach(a => INDEX.push({ kind: 'Autor', t: plain(a.quien), s: plain(a.idea), href: `#/tema/${t.key}/${s.id}${anchor}`, red: s.red }));
-        if (b.t === 'viz') INDEX.push({ kind: 'Interactivo', t: plain(b.titulo), s: plain(b.desc), href: `#/tema/${t.key}/${s.id}${anchor}`, red: s.red });
-        if (b.t === 'h') INDEX.push({ kind: 'Apartado', t: plain(b.html), s: s.titulo, href: `#/tema/${t.key}/${s.id}${anchor}`, red: s.red });
+        if (b.t === 'h') { curH = b.id || slugH(b.html); curHT = plain(b.html); }
+        const href = base + (curH ? `?a=${curH}` : '');
+        const where = `${s.num} · ${s.titulo}${curHT ? ' › ' + curHT : ''}`;
+        if (b.t === 'concepto') add({ kind: 'Concepto', t: b.titulo, s: b.def, href, red: b.red || s.red });
+        if (b.t === 'glosario') b.items.forEach(([term, d]) => add({ kind: 'Término', t: term, s: d, href, red: s.red }));
+        if (b.t === 'pares') [b.a, b.b].forEach(p => add({ kind: 'Concepto', t: p.titulo, s: p.texto || (p.items || []).join(' '), href, red: s.red }));
+        if (b.t === 'autores') b.items.forEach(a => add({ kind: 'Autor', t: a.quien + (a.anio ? ` (${a.anio})` : ''), s: a.idea, href, red: s.red }));
+        if (b.t === 'viz') add({ kind: 'Interactivo', t: b.titulo, s: b.desc || '', href, red: s.red });
+        if (b.t === 'h') add({ kind: 'Apartado', t: b.html, s: s.titulo, href, red: s.red });
+        const txt = blockText(b);
+        if (txt) add({ kind: 'Texto', t: where, s: txt, href, red: b.red || s.red });
       }
     }
-    for (const c of t.tarjetas) INDEX.push({ kind: 'Tarjeta', t: plain(c.frente), s: plain(c.dorso), href: `#/tarjetas/${t.key}/${c.sec}`, red: t.secciones.find(s => s.id === c.sec)?.red });
+    for (const c of t.tarjetas) add({ kind: 'Tarjeta', t: c.frente, s: c.dorso, href: `#/tarjetas/${t.key}/${c.sec}`, red: t.secciones.find(s => s.id === c.sec)?.red });
+    for (const q of t.test) add({ kind: 'Pregunta', t: q.q, s: `${q.o[q.c]}. ${q.e}`, href: `#/test/${t.key}/${q.sec}`, red: t.secciones.find(s => s.id === q.sec)?.red });
   }
-  import('../../content/atlas.js').then(({ REGIONES }) => Object.values(REGIONES).forEach(r => INDEX.push({ kind: 'Región', t: r.nombre, s: r.aka + ' · ' + r.funcion, href: '#/atlas', red: 'base' })));
-  INDEX.forEach(i => (i.n = norm(i.t + ' ' + i.s), i.nt = norm(i.t)));
+  for (const [id, r] of Object.entries(REGIONES)) add({ kind: 'Región', t: r.nombre, s: `${r.aka || ''} · ${r.funcion}`, href: `#/atlas?r=${id}`, red: 'base' });
+  for (const i of INDEX) { i.t = plain(i.t); i.s = plain(i.s || ''); i.nt = norm(i.t); i.n = i.nt + ' ' + norm(i.s); }
 }
 
 const sBox = $('#search'), sIn = $('#searchInput'), sRes = $('#searchResults');
-let sSel = 0, sItems = [];
-function openSearch() { if (!INDEX) buildIndex(); sBox.hidden = false; sIn.value = ''; doSearch(); setTimeout(() => sIn.focus(), 10); }
-function closeSearch() { sBox.hidden = true; }
-function hl(text, q) {
-  const words = q.split(/\s+/).filter(w => w.length > 1); let out = esc(text);
-  if (!words.length) return out;
+let sSel = 0, sItems = [], lastFocus = null;
+function openSearch() {
+  if (!INDEX) buildIndex();
+  lastFocus = document.activeElement;
+  sBox.hidden = false; sIn.value = ''; doSearch(); setTimeout(() => sIn.focus(), 10);
+}
+function closeSearch() { if (sBox.hidden) return; sBox.hidden = true; if (lastFocus && document.contains(lastFocus)) lastFocus.focus?.({ preventScroll: true }); }
+
+// Resalta las palabras buscadas (norm() conserva las posiciones del texto original)
+function hl(text, words) {
+  if (!words.length) return esc(text);
   const n = norm(text); const marks = [];
-  words.forEach(w => { let i = n.indexOf(w); if (i >= 0) marks.push([i, i + w.length]); });
-  if (!marks.length) return out;
+  words.forEach(w => { let i = n.indexOf(w); while (i >= 0) { marks.push([i, i + w.length]); i = n.indexOf(w, i + w.length); } });
+  if (!marks.length) return esc(text);
   marks.sort((a, b) => a[0] - b[0]);
   let res = '', last = 0;
   for (const [a, b] of marks) { if (a < last) continue; res += esc(text.slice(last, a)) + '<mark>' + esc(text.slice(a, b)) + '</mark>'; last = b; }
   return res + esc(text.slice(last));
 }
+// Trozo del texto alrededor de la primera coincidencia
+function snippet(text, words) {
+  const n = norm(text);
+  let i = Math.min(...words.map(w => { const k = n.indexOf(w); return k < 0 ? Infinity : k; }));
+  if (!isFinite(i)) i = 0;
+  const from = Math.max(0, i - 50), to = Math.min(text.length, i + 110);
+  return (from > 0 ? '…' : '') + text.slice(from, to) + (to < text.length ? '…' : '');
+}
+const KIND_SCORE = { Concepto: 8, Término: 8, Región: 7, Autor: 7, Apartado: 6, Sección: 5, Interactivo: 4, Tema: 3, Tarjeta: 2, Pregunta: 1, Texto: 0 };
 function doSearch() {
-  const q = norm(sIn.value);
-  if (!q) {
-    sItems = INDEX.filter(i => i.kind === 'Sección').slice(0, 30);
+  const q = norm(sIn.value).trim();
+  const words = q.split(/\s+/).filter(Boolean);
+  if (!words.length) {
+    sItems = INDEX.filter(i => i.kind === 'Sección');
   } else {
-    const words = q.split(/\s+/).filter(Boolean);
+    const seen = new Set();
     sItems = INDEX.map(i => {
       if (!words.every(w => i.n.includes(w))) return null;
-      let sc = 0; words.forEach(w => { if (i.nt.includes(w)) sc += 10; if (i.nt.startsWith(w)) sc += 5; });
-      sc += { Concepto: 6, Término: 6, Sección: 5, Autor: 5, Región: 4, Apartado: 3, Interactivo: 3, Tarjeta: 1, Tema: 2 }[i.kind] || 0;
+      let sc = KIND_SCORE[i.kind] || 0;
+      words.forEach(w => { if (i.nt.includes(w)) sc += 10; if (i.nt.startsWith(w)) sc += 4; });
+      if (i.nt === q) sc += 15;
       return { ...i, sc };
-    }).filter(Boolean).sort((a, b) => b.sc - a.sc).slice(0, 40);
+    }).filter(Boolean).sort((a, b) => b.sc - a.sc)
+      // un solo resultado "en el texto" por apartado
+      .filter(i => { if (i.kind !== 'Texto') return true; if (seen.has(i.href)) return false; seen.add(i.href); return true; })
+      .slice(0, 40);
   }
   sSel = 0;
-  sRes.innerHTML = sItems.length ? sItems.map((i, k) => `<li><a href="${i.href}" data-red="${i.red || 'base'}" role="option" aria-selected="${k === 0}"><span class="kind">${i.kind}</span><span><span class="t">${hl(i.t, q)}</span><span class="s">${hl(i.s.slice(0, 140), q)}</span></span></a></li>`).join('')
-    : `<li class="empty">Nada encontrado para "${esc(sIn.value)}".</li>`;
+  const hw = words.filter(w => w.length > 1);
+  sRes.innerHTML = sItems.length
+    ? sItems.map((i, k) => `<li><a href="${i.href}" data-red="${i.red || 'base'}" role="option" aria-selected="${k === 0}"><span class="kind">${i.kind === 'Texto' ? 'En el texto' : i.kind}</span><span><span class="t">${hl(i.t, hw)}</span><span class="s">${hl(hw.length ? snippet(i.s, hw) : i.s.slice(0, 140), hw)}</span></span></a></li>`).join('')
+    : `<li class="empty">Nada encontrado para "${esc(sIn.value)}". Prueba con otra palabra.</li>`;
+}
+function goTo(href) {
+  closeSearch();
+  if (href === location.hash) route(); else location.hash = href;
 }
 sIn.addEventListener('input', doSearch);
 sIn.addEventListener('keydown', e => {
   const links = $$('a', sRes);
-  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+  if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && links.length) {
     e.preventDefault(); sSel = (sSel + (e.key === 'ArrowDown' ? 1 : -1) + links.length) % links.length;
     links.forEach((a, k) => a.setAttribute('aria-selected', String(k === sSel))); links[sSel]?.scrollIntoView({ block: 'nearest' });
   }
-  if (e.key === 'Enter' && links[sSel]) { location.hash = links[sSel].getAttribute('href'); closeSearch(); }
+  if (e.key === 'Enter' && links[sSel]) { e.preventDefault(); goTo(links[sSel].getAttribute('href')); }
 });
-sRes.addEventListener('click', e => { if (e.target.closest('a')) closeSearch(); });
+sRes.addEventListener('click', e => { const a = e.target.closest('a'); if (a) { e.preventDefault(); goTo(a.getAttribute('href')); } });
 sBox.addEventListener('click', e => { if (e.target === sBox) closeSearch(); });
+$('#searchClose').addEventListener('click', closeSearch);
 $$('[data-open-search]').forEach(b => b.addEventListener('click', openSearch));
 
 // ---------------------------------------------------------------- atajos
@@ -225,7 +277,16 @@ addEventListener('keydown', e => {
   if (e.key === 'Escape') { if (!sBox.hidden) closeSearch(); closeDrawer(); }
   if (typing || e.ctrlKey || e.metaKey || e.altKey) return;
   if (e.key === '/') { e.preventDefault(); openSearch(); }
-  if (e.key.toLowerCase() === 'b' && !isMobile() && !document.querySelector('.fcard, .arena')) toggleRail();
+  // "b" pliega el menú, salvo donde la tecla ya significa otra cosa (respuesta B del test, juegos, tarjetas)
+  if (e.key.toLowerCase() === 'b' && !isMobile() && !document.querySelector('.fcard, .arena, .q-card')) toggleRail();
+});
+
+// Con el menú plegado, tocar un bloque o tema lo despliega en vez de abrir un grupo invisible
+$('#sbNav').addEventListener('click', e => {
+  const sum = e.target.closest('summary');
+  if (sum && document.documentElement.classList.contains('rail') && !isMobile()) {
+    e.preventDefault(); toggleRail(); sum.parentElement.open = true;
+  }
 });
 
 // ---------------------------------------------------------------- toast

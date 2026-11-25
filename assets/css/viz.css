@@ -40,7 +40,7 @@
 .legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
 
 .readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
-.readout div { background: var(--paper-2); border-radius: 10px; padding: 10px 12px; }
+.readout > div { background: var(--paper-2); border-radius: 10px; padding: 10px 12px; }
 .readout .v { font: 800 1.5rem/1 var(--f-display); }
 .readout .l { font-size: .75rem; color: var(--muted); margin-top: 4px; font-weight: 700; }
 
@@ -108,10 +108,10 @@
 /* ---------- Flujo de señal (diagrama nodo-enlace) ---------- */
 .flow-svg { width: 100%; height: auto; }
 .flow-node rect { fill: var(--card); stroke: var(--line-2); stroke-width: 1.5; transition: fill .3s, stroke .3s; }
-.flow-node text { font: 700 13px var(--f-body); fill: var(--ink); }
-.flow-node .sub { font: 400 11px var(--f-body); fill: var(--muted); }
+.flow-svg .flow-node text { font: 700 13px var(--f-body); fill: var(--ink); }
+.flow-svg .flow-node .sub { font: 400 11px var(--f-body); fill: var(--muted); }
 .flow-node.on rect { fill: var(--accent-tint); stroke: var(--accent); stroke-width: 2.5; }
-.flow-node.on text { fill: var(--accent-ink); }
+.flow-svg .flow-node.on text { fill: var(--accent-ink); }
 .flow-edge { fill: none; stroke: var(--line-2); stroke-width: 2; }
 .flow-edge.on { stroke: var(--accent); stroke-width: 3; }
 .flow-pkt { fill: var(--accent); }
@@ -170,8 +170,12 @@
 .axis-card .levels { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .axis-card .levels button { border: 1px solid var(--c); background: transparent; color: var(--ink); border-radius: 8px; padding: 5px 10px; font-size: .82rem; font-weight: 700; cursor: pointer; min-height: 34px; }
 .axis-card .levels button[aria-pressed="true"] { background: var(--c); color: #fff; }
+.viz-body { container-type: inline-size; }
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
-@media (max-width: 760px) { .split { grid-template-columns: 1fr; } }
+.split > svg.chart { width: 100%; max-width: 560px; justify-self: center; }
+@container (max-width: 820px) { .split:not(.pair) { grid-template-columns: 1fr; } }
+@container (max-width: 460px) { .split.pair { grid-template-columns: 1fr; } }
+.axes-legend { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
 
 /* Esquemas y barras de activación (Norman-Shallice) */
 .ns-bars { display: grid; gap: 10px; }
