@@ -1,0 +1,11 @@
+# Material original (no se publica)
+*.pdf
+fuentes/
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Claude local
+.claude/settings.local.json
