@@ -34,6 +34,18 @@ const REG = {
   reentrante: ['./modelos.js', 'reentrante'],
   gnw: ['./modelos.js', 'gnw'],
   cnc: ['./modelos.js', 'cnc'],
+
+  rangos: ['./ciclo.js', 'rangos'],
+  relojEdad: ['./ciclo.js', 'relojEdad'],
+  sentidos: ['./ciclo.js', 'sentidos'],
+  mielina: ['./ciclo.js', 'mielina'],
+  menopausia: ['./ciclo.js', 'menopausia'],
+  barras: ['./ciclo.js', 'barras'],
+  clasifica: ['./ciclo.js', 'clasifica'],
+  habitos: ['./ciclo.js', 'habitos'],
+  balanzaTH: ['./ciclo.js', 'balanzaTH'],
+  ucv: ['./ciclo.js', 'ucv'],
+  agudoCronico: ['./ciclo.js', 'agudoCronico'],
 };
 
 export const VIZ_IDS = Object.keys(REG);

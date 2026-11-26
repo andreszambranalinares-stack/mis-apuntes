@@ -5,16 +5,30 @@
 // contenido aparece en el menú como hueco reservado.
 // ============================================================================
 import t3 from './apm/b1/t3/tema.js';
+import cv5 from './cv/b1/t5/tema.js';
 
 export const ASIGNATURAS = [
   {
     id: 'apm',
     nombre: 'Atención, percepción y memoria',
     corto: 'APM',
+    colores: [['alerta', 'Alerta'], ['orient', 'Orientación'], ['control', 'Control ejecutivo'], ['consc', 'Consciencia'], ['base', 'Marco general']],
     bloques: [
       {
         id: 'b1', num: 'I', nombre: 'Atención', red: 'orient',
         temas: [t3],
+      },
+    ],
+  },
+  {
+    id: 'cv',
+    nombre: 'Ciclo vital',
+    corto: 'CV',
+    colores: [['base', 'Marco general'], ['fisico', 'Cambios físicos'], ['repro', 'Sexualidad y reproducción'], ['salud', 'Salud'], ['estres', 'Estrés y emociones']],
+    bloques: [
+      {
+        id: 'b1', num: 'I', nombre: 'Adultez media', red: 'salud',
+        temas: [cv5],
       },
     ],
   },

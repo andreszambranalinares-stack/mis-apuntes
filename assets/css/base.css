@@ -25,6 +25,11 @@
   --consc: #7448AE;       --consc-ink: #522C86;    --consc-tint: #E6DCF3;
   --base: #1C8478;        --base-ink: #0F5A51;     --base-tint: #D3ECE7;
   --dmn: #8C6A2E;         --sal: #B0336F;
+  /* Ciclo vital */
+  --fisico: #23809A; --fisico-ink: #12566A; --fisico-tint: #D2E9EF;
+  --repro: #B23C78; --repro-ink: #7E2453; --repro-tint: #F4DAE7;
+  --salud: #4F8A2A; --salud-ink: #335E18; --salud-tint: #DDEDD2;
+  --estres: #A0522D; --estres-ink: #6E3417; --estres-tint: #F1DDD1;
 
   --ok: #2F7D4A; --ok-tint: #D9EEDF;
   --bad: #B23A2A; --bad-tint: #F5D9D3;
@@ -62,6 +67,10 @@
     --consc: #A985E0; --consc-ink: #CDB6F2; --consc-tint: #2A1E3D;
     --base: #3DBBAA; --base-ink: #8EDDD1; --base-tint: #11302C;
     --dmn: #C9A45E; --sal: #E7639F;
+    --fisico: #5CB8D6; --fisico-ink: #9AD6EA; --fisico-tint: #10303A;
+    --repro: #E37AB0; --repro-ink: #F2B1D2; --repro-tint: #3A1629;
+    --salud: #8BC662; --salud-ink: #B9E09C; --salud-tint: #1C2E12;
+    --estres: #E08A5E; --estres-ink: #F2B797; --estres-tint: #3A2014;
     --ok: #5CC283; --ok-tint: #14301F; --bad: #F0705E; --bad-tint: #3A1913;
     --shadow: 0 1px 0 rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.8);
   }
@@ -77,6 +86,10 @@
   --consc: #A985E0; --consc-ink: #CDB6F2; --consc-tint: #2A1E3D;
   --base: #3DBBAA; --base-ink: #8EDDD1; --base-tint: #11302C;
   --dmn: #C9A45E; --sal: #E7639F;
+  --fisico: #5CB8D6; --fisico-ink: #9AD6EA; --fisico-tint: #10303A;
+  --repro: #E37AB0; --repro-ink: #F2B1D2; --repro-tint: #3A1629;
+  --salud: #8BC662; --salud-ink: #B9E09C; --salud-tint: #1C2E12;
+  --estres: #E08A5E; --estres-ink: #F2B797; --estres-tint: #3A2014;
   --ok: #5CC283; --ok-tint: #14301F; --bad: #F0705E; --bad-tint: #3A1913;
   --shadow: 0 1px 0 rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.8);
 }
@@ -87,6 +100,10 @@
 [data-red="control"] { --accent: var(--control); --accent-ink: var(--control-ink); --accent-tint: var(--control-tint); }
 [data-red="consc"]   { --accent: var(--consc);   --accent-ink: var(--consc-ink);   --accent-tint: var(--consc-tint); }
 [data-red="base"]    { --accent: var(--base);    --accent-ink: var(--base-ink);    --accent-tint: var(--base-tint); }
+[data-red="fisico"]  { --accent: var(--fisico); --accent-ink: var(--fisico-ink); --accent-tint: var(--fisico-tint); }
+[data-red="repro"]   { --accent: var(--repro); --accent-ink: var(--repro-ink); --accent-tint: var(--repro-tint); }
+[data-red="salud"]   { --accent: var(--salud); --accent-ink: var(--salud-ink); --accent-tint: var(--salud-tint); }
+[data-red="estres"]  { --accent: var(--estres); --accent-ink: var(--estres-ink); --accent-tint: var(--estres-tint); }
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--top-h) + 16px); }

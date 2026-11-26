@@ -30,7 +30,7 @@ assets/js/viz/index.js     REGISTRO de interactivos (id → módulo)
 assets/js/viz/*.js         interactivos (cerebro, gráficas, juegos, modelos…)
 content/indice.js          REGISTRO del temario (asignaturas → bloques → temas)
 content/atlas.js           regiones cerebrales y redes COMPARTIDAS por todos los temas
-content/<asig>/<bloque>/<tema>/
+content/<asig>/<bloque>/<tema>/   (apm/b1/t3 · cv/b1/t5)
     tema.js                metadatos + orden de secciones + referencias
     parte-*.js             secciones (bloques de contenido)
     tarjetas.js            tarjetas de repaso
@@ -48,8 +48,15 @@ Rutas: `#/` · `#/tema/<key>` · `#/tema/<key>/<seccion>` · `#/tarjetas[/<key>[
 | Control ejecutivo | `control` (coral) | `red: 'control'` |
 | Consciencia | `consc` (violeta) | `red: 'consc'` |
 | Marco general / intro | `base` (aguamarina) | `red: 'base'` |
+| Ciclo vital: cambios físicos | `fisico` (azul petróleo) | `red: 'fisico'` |
+| Ciclo vital: sexualidad y reproducción | `repro` (frambuesa) | `red: 'repro'` |
+| Ciclo vital: salud | `salud` (verde hoja) | `red: 'salud'` |
+| Ciclo vital: estrés y emociones | `estres` (siena) | `red: 'estres'` |
 Para temas nuevos de otra materia (percepción, memoria…) se pueden añadir tokens en
-`base.css` (`:root` + modo oscuro) y en el selector `[data-red="…"]`.
+`base.css` (`:root` + los dos bloques de modo oscuro) y en el selector `[data-red="…"]`.
+Cada asignatura de `content/indice.js` lleva `colores: [[token, etiqueta]]` para la leyenda
+de inicio. El mapa del tema sale de `tema.mapa`: `'posner'` (Tema 3) o
+`{ centro: [título, subtítulo], nodos: [{ label, red, sec }] }`.
 
 ## Sección
 ```js
@@ -93,6 +100,10 @@ Cada sección debe terminar con un bloque `esencial`. Usa `trampa` para confusio
 - Juegos: `mackworth`, `posner`, `busqueda`, `conjuncion`, `stroop`, `gonogo`.
 - Modelos: `negligencia`, `normanShallice`, `inhibicionLateral`, `teatro`, `reentrante`,
   `gnw`, `cnc`.
+- Ciclo vital (`viz/ciclo.js`): `rangos`, `relojEdad` (`props: { grupo: 'sentidos'|'cuerpo' }`),
+  `sentidos`, `mielina`, `menopausia`, `habitos`, `balanzaTH`, `ucv`, `agudoCronico`.
+  Reutilizables con datos en el propio módulo: `barras` (`props: { set }`, conjuntos en
+  `BARRAS`) y `clasifica` (juego de dos categorías, `props: { set }`, conjuntos en `CLASIF`).
 
 Nuevo interactivo: función `export function nombre(el, props) { …; return cleanup }` en
 `assets/js/viz/`, registrarla en `viz/index.js`. Debe: funcionar con toque y teclado, usar

@@ -10,6 +10,7 @@ export default {
   corto: 'Atención y consciencia',
   resumen: 'El modelo de redes de Posner y Petersen (alerta, orientación y control ejecutivo) y las grandes teorías de la consciencia.',
   redes: ['alerta', 'orient', 'control', 'consc'],
+  mapa: 'posner',
   partes: {
     '0': { titulo: 'Para empezar', red: 'base' },
     I: { titulo: 'El modelo de atención de Posner y Petersen', red: 'orient', desc: 'Tres redes con circuitos propios: alerta, orientación y control ejecutivo.' },

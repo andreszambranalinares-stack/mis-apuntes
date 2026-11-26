@@ -32,7 +32,7 @@ export function pageHome() {
       <div>
         <div class="eyebrow"><span class="pill" style="background:var(--ink);color:var(--paper)">Cuaderno de estudio</span> ${ASIGNATURAS.map(a => esc(a.nombre)).join(' · ')}</div>
         <h1>Mis <em>Apuntes</em></h1>
-        <p>Todo el temario, pero contado con el cerebro delante: redes que se iluminan, experimentos que puedes jugar, tarjetas que se repasan solas y tests tipo examen.</p>
+        <p>Todo el temario, contado de forma visual: esquemas que se mueven, simuladores y experimentos que puedes jugar, tarjetas que se repasan solas y tests tipo examen.</p>
         <div class="cta">
           ${lastS ? `<a class="btn primary" href="#/tema/${lastT.key}/${lastS.id}">${icon('play')}Seguir: ${esc(lastS.titulo)}</a>` : `<a class="btn primary" href="#/tema/${TEMAS[0].key}/${TEMAS[0].secciones[0].id}">${icon('play')}Empezar por el principio</a>`}
           <a class="btn" href="#/tarjetas">${due} tarjetas para hoy</a>
@@ -52,7 +52,7 @@ export function pageHome() {
     <div class="bloques">
       ${ASIGNATURAS.map(a => a.bloques.map(b => `
         <div>
-          <div class="bloque-head"><span class="roman">${b.num}</span><h3>Bloque ${b.num} · ${esc(b.nombre)}</h3></div>
+          <div class="bloque-head"><span class="roman">${b.num}</span><h3>${ASIGNATURAS.length > 1 ? `${esc(a.nombre)} · ` : ''}Bloque ${b.num} · ${esc(b.nombre)}</h3></div>
           <div class="temas">
             ${b.temas.map(t => temaCard(TEMAS.find(x => x.id === t.id && x.bloque.id === b.id))).join('')}
             <div class="tema-card soon" aria-hidden="true"><div class="spine"><b>+</b><i>Próximamente</i><div class="bands"></div></div><div class="body"><h4>Siguiente tema</h4><p>Cuando haya nuevo temario aparecerá aquí, con el mismo formato.</p></div></div>
@@ -61,13 +61,7 @@ export function pageHome() {
     </div>
 
     <h2 class="h-sec">Código de colores <small>es el mismo en toda la web</small></h2>
-    <div class="leyenda">
-      <span><i style="background:var(--alerta)"></i>Alerta</span>
-      <span><i style="background:var(--orient)"></i>Orientación</span>
-      <span><i style="background:var(--control)"></i>Control ejecutivo</span>
-      <span><i style="background:var(--consc)"></i>Consciencia</span>
-      <span><i style="background:var(--base)"></i>Marco general</span>
-    </div>
+    ${ASIGNATURAS.map(a => `<div class="leyenda"${ASIGNATURAS.length > 1 ? ` aria-label="${esc(a.nombre)}"` : ''}>${ASIGNATURAS.length > 1 ? `<b style="margin-right:4px">${esc(a.corto)}</b>` : ''}${(a.colores || []).map(([k, l]) => `<span><i style="background:var(--${k})"></i>${esc(l)}</span>`).join('')}</div>`).join('')}
   </div></div>`;
   return { html, title: '', crumbs: [{ t: 'Inicio' }] };
 }
@@ -135,8 +129,22 @@ export function pageTema(key) {
   return { html, title: `Tema ${t.num}`, crumbs: [{ t: 'Inicio', h: '#/' }, { t: `Tema ${t.num}` }] };
 }
 
-// Mini mapa conceptual del tema (SVG)
+// Mini mapa conceptual del tema (SVG). t.mapa = 'posner' (Tema 3) o { centro, nodos }.
 function mapaTema(t) {
+  if (t.mapa === 'posner') return mapaPosner(t);
+  if (!t.mapa?.nodos) return '';
+  const { centro, nodos } = t.mapa, k = t.key, n = nodos.length;
+  const cx = 210, cy = 150, R = 112;
+  const pos = nodos.map((_, i) => { const a = -Math.PI / 2 + (i * 2 * Math.PI) / n; return [cx + Math.cos(a) * R * 1.45, cy + Math.sin(a) * R * .95]; });
+  const links = pos.map(([x, y]) => `<path d="M${cx} ${cy} L ${x} ${y}" stroke="var(--line-2)" stroke-width="2" fill="none"/>`).join('');
+  const ring = `<path d="M ${pos.map(p => p.join(' ')).join(' L ')} Z" stroke="var(--line-2)" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>`;
+  const dots = nodos.map((d, i) => { const [x, y] = pos[i]; const c = `var(--${d.red})`; return `<a href="#/tema/${k}/${d.sec}"><g><circle cx="${x}" cy="${y}" r="26" fill="${c}" opacity=".14"/><circle cx="${x}" cy="${y}" r="14" fill="${c}"/><text x="${x}" y="${y + 40}" text-anchor="middle" class="svgtext" style="font:700 11.5px var(--f-body)">${esc(d.label)}</text></g></a>`; }).join('');
+  return `<svg viewBox="0 0 420 320" class="chart" role="img" aria-label="Mapa conceptual del tema">${links}${ring}
+    <rect x="${cx - 80}" y="${cy - 22}" width="160" height="44" rx="12" fill="var(--ink)"/><text x="${cx}" y="${cy - 2}" text-anchor="middle" style="font:800 13px var(--f-display);fill:var(--paper)">${esc(centro[0])}</text><text x="${cx}" y="${cy + 13}" text-anchor="middle" style="font:600 9.5px var(--f-mono);fill:var(--paper);opacity:.7">${esc(centro[1] || '')}</text>
+    ${dots}</svg>`;
+}
+
+function mapaPosner(t) {
   const W = 420, H = 300;
   const I = t.secciones.filter(s => s.parte === 'I'), II = t.secciones.filter(s => s.parte === 'II');
   const node = (x, y, label, color, href, r = 30) => `<a href="${href}"><g><circle cx="${x}" cy="${y}" r="${r}" fill="${color}" opacity=".14"/><circle cx="${x}" cy="${y}" r="${r * .55}" fill="${color}"/><text x="${x}" y="${y + r + 14}" text-anchor="middle" class="svgtext" style="font:700 11.5px var(--f-body)">${label}</text></g></a>`;
